@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <style>
+    .tooltip {
+    position: relative;
+    display: inline-block;
+    border-bottom: 1px dotted black; /* If you want dots under the hoverable text */
+    }
+    .tooltip .tooltiptext {
+    visibility: hidden;
+    width: 120px;
+    background-color: black;
+    color: #fff;
+    text-align: center;
+    padding: 5px 0;
+    border-radius: 6px;
+    
+    position: absolute;
+    z-index: 1;
+    }
+    .tooltip:hover .tooltiptext {
+    visibility: visible;
+    }
+    </style>
+  </head>
+  <script>
+      // Prevent forms from submitting.
+      function preventFormSubmit() {
+        var forms = document.querySelectorAll('form');
+        for (var i = 0; i < forms.length; i++) {
+          forms[i].addEventListener('submit', function(event) {
+            event.preventDefault();
+          });
+        }
+      }
+      window.addEventListener('load', preventFormSubmit);
+
+      function handleFormSubmit(formObject) {
+        google.script.run.withFailureHandler(failed).withSuccessHandler(dataSaved).processResidualForm(formObject);
+      }
+      
+      function dataSaved() {
+        //alert("Saved");
+        google.script.host.close();
+      }
+      
+      function failed() {
+      alert("Error saving data!");
+      }
+
+      function updateHelp(val) {
+	    //document.getElementById("help").textContent = val.selectedOptions[0].dataset.message;
+        //alert("setting: " + val.selectedOptions[0].dataset.message);
+        document.getElementById(val.dataset.element).textContent = val.selectedOptions[0].dataset.message;
+      }
+
+  </script>
+  <body>
+  <? var residualFactors = getResidualFactors(); ?>
+  <? var residualOptions = getResidualOptions(); ?>
+  <? var tips = getResidualTooltips(); ?>
+  <form id="myForm" onsubmit="handleFormSubmit(this)">
+  <input type="hidden" name="RowId" id="RowId" value="<?= data["RowId"] ?>" />
+  <input type="hidden" name="InherentId" id="InherentId" value="<?= data["InherentId"] ?>" />
+  <table style="border: 1px solid black; border-collapse: collapse">
+    <tr ><td><label for="System Identifier">System Identifier</label></td><td><input name="System Identifier" readonly id="System Identifier" type=text value="<?= data["System Identifier"] ?>" /></td></tr>
+    <tr ><td><label for="Release">Release</label></td><td><input type=text name="Release" id="Release" value="<?= data["Release"] ?>" /></td></tr>
+    <? for(var i = 0; i < residualFactors.length; i++) { ?>
+      <? var helpId = Utilities.getUuid() ?>
+      <tr style="border: 1px solid black">
+        <td><div class="tooltip"><?= residualFactors[i] ?><span class="tooltiptext"><?= tips[residualFactors[i]] ? tips[residualFactors[i]] : ""  ?></span></div></td>
+        <td>
+          <select name="<?= residualFactors[i] ?>" id="<?= residualFactors[i] ?>" data-element="<?= helpId ?>" onchange="updateHelp(this)" >
+            <option value=""></option>
+            <? var lo = residualOptions.filter(function (o) { return o.factor === residualFactors[i]; } ); ?>
+            <? for(var j = 0; j < lo.length; j++) { ?>
+              <? if( data[residualFactors[i]] == lo[j].option) { ?> 
+                 <option selected value="<?= lo[j].option ?>" data-message="<?= lo[j].helpText ?>"><?= lo[j].option ?></option>
+              <? } else { ?>
+                 <option value="<?= lo[j].option ?>" data-message="<?= lo[j].helpText ?>"><?= lo[j].option ?></option>
+              <? } ?>
+            <? } ?>
+          </select>
+        </td>
+      </tr>
+      <tr>
+        <td colspan=2>
+          <div id="<?= helpId ?>" name="<?= helpId ?>" style="border: 1px solid grey; border-radius: 3px; text-indent:30px;"></div>
+        </td>
+      </tr>
+    <? } ?>
+  </table>
+  <input type="button" value="Cancel" onclick="google.script.host.close()" />&nbsp;&nbsp;&nbsp;<input type="submit" value="Save" />  
+  </form>
+  </body>
+</html>
+
+

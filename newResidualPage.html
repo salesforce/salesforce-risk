@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+ <head>
+    <base target="_top">
+ </head>
+ <script>
+      // Prevent forms from submitting.
+      function preventFormSubmit() {
+        var forms = document.querySelectorAll('form');
+        for (var i = 0; i < forms.length; i++) {
+          forms[i].addEventListener('submit', function(event) {
+            event.preventDefault();
+          });
+        }
+      }
+      window.addEventListener('load', preventFormSubmit);
+
+      function handleFormSubmit(formObject) {
+        google.script.run.withFailureHandler(failed).processNewResidualForm(formObject);
+        google.script.host.close();
+      }
+      
+      function dataSaved() {
+        google.script.host.close();
+      }
+      
+      function failed() {
+         alert("Error saving data!");
+      }
+ </script>
+ <body>
+  <form id="myForm" onsubmit="handleFormSubmit(this)">
+    <p>Create residual risk entry for which system?</p>
+    <p>
+      <select name="systemName" >
+          <? for(var i = 0; i < data.length; i++) { ?>
+              <option value="<?= data[i] ?>"><?= data[i] ?></option>
+          <? } ?>
+      </select>
+    </p>
+    <p>
+      <input type="button" value="Cancel" onclick="google.script.host.close()" />&nbsp;&nbsp;&nbsp;<input type="submit" value="Create" />
+   </p>  
+  </form>
+ </body>
+</html>
+
+
