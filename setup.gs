@@ -128,10 +128,10 @@ function inherentRiskTab() {
   sheet.hideColumns(1);
   sheet.getRange("C:C").setNumberFormat("@");
   var imageBlob = Utilities.newBlob(Utilities.base64Decode(loadImage), 'image/png', 'loadImage');
-  var loadImg = sheet.insertImage(loadImage, 9,1);
+  var loadImg = sheet.insertImage(imageBlob, 9,1);
   loadImg.assignScript("loadSystemFromInherentSheet");
   imageBlob = Utilities.newBlob(Utilities.base64Decode(newReleaseImage), 'image/png', 'newReleaseImage');
-  var newRelImg = sheet.insertImage(newReleaseImage, 10, 1);
+  var newRelImg = sheet.insertImage(imageBlob, 10, 1);
   newRelImg.assignScript("newReleaseFromInherentSheet");  
 }
 
@@ -209,10 +209,10 @@ function residualRiskTab() {
   sheet.hideColumns(1);
   sheet.getRange("C:C").setNumberFormat("@");
   var imageBlob = Utilities.newBlob(Utilities.base64Decode(loadImage), 'image/png', 'loadImage');
-  var loadImg = sheet.insertImage(loadImage, 9,1);
+  var loadImg = sheet.insertImage(imageBlob, 9,1);
   loadImg.assignScript("loadResidualFromResidualSheet");
   imageBlob = Utilities.newBlob(Utilities.base64Decode(newReleaseImage), 'image/png', 'newReleaseImage');
-  var newRelImg = sheet.insertImage(newReleaseImage, 10, 1);
+  var newRelImg = sheet.insertImage(imageBlob, 10, 1);
   newRelImg.assignScript("newReleaseFromResidualSheet");  
 }
 
