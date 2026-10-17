@@ -9,6 +9,34 @@ var residualDataSheet = "Raw Residual Data"
 var residualRiskFactorSheet = "ResidualRiskFactors"
 var inherentRiskSheet = "Inherent Risk";
 
+/**
+ * Returns the active spreadsheet. If Initialize (or another setup helper)
+ * is run from a standalone Apps Script project with no bound Sheet,
+ * SpreadsheetApp.getActiveSpreadsheet() is null and tab creation throws
+ * "Cannot read property 'getSheetByName' of null". In that case, create a
+ * new spreadsheet, set it active, and return it.
+ *
+ * Prefer the documented workflow: open a Google Sheet, then
+ * Extensions > Apps Script, and paste the project files there so the
+ * script is container-bound.
+ *
+ * @param {string=} optTitle title used when creating a new spreadsheet
+ * @return {SpreadsheetApp.Spreadsheet}
+ */
+function getActiveOrCreateSpreadsheet(optTitle) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  if (ss) {
+    return ss;
+  }
+  var title = optTitle || "Salesforce Risk";
+  ss = SpreadsheetApp.create(title);
+  SpreadsheetApp.setActiveSpreadsheet(ss);
+  Logger.log(
+    "No bound spreadsheet found. Created a new spreadsheet at: " + ss.getUrl()
+  );
+  return ss;
+}
+
 function mapRowToSystem(rowValues, headerValues) {
   var ret = {};
   for(var i = 0; i < headerValues.length; i++) {
