@@ -23,15 +23,26 @@ For both inherent and residual risk calculations we are attempting to condense m
 
 ## Implementation
 
-This repository contains Google Script code that must be contained in a single Google Sheets Script project. Place the contents of each file into an appropriate file in the script project.
+This repository contains Google Apps Script code that must run as a **container-bound** script on a Google Sheet (not a standalone Apps Script project).
+
+### Create the bound script project
+
+1. Create a new [Google Sheet](https://sheets.google.com/) (or open an existing blank workbook).
+1. From the sheet menu, open **Extensions → Apps Script** (older UIs: **Tools → Script editor**). This creates a script project bound to that spreadsheet.
+1. In the Apps Script editor, replace the default `Code.gs` contents and add one script/HTML file per repository file (`.gs` → script files, `.html` → HTML files), copying each file’s contents into the matching Apps Script file.
+1. Save the project.
+
+> **Why bound?** `Initialize` and the rest of the app call `SpreadsheetApp.getActiveSpreadsheet()`. In a standalone script that returns `null`, which previously caused `TypeError: Cannot read property 'getSheetByName' of null` ([#1](https://github.com/salesforce/salesforce-risk/issues/1)). `Initialize` will now create a spreadsheet if none is bound, but the supported workflow is still a sheet-bound project.
 
 ## Initial Setup
 
-Once all of the scripts and HTML assets are in place in the Google Script project, run the **Initialize** function in the setup.gs module. This function will provision all of the required spreadsheet assets and result in an application ready for configuration.
+Once all of the scripts and HTML assets are in place in the bound Google Script project, run the **Initialize** function in the `setup.gs` module (select `Initialize` in the Apps Script editor and click **Run**; authorize the script when prompted). This function will provision all of the required spreadsheet tabs and named ranges and result in an application ready for configuration.
+
+If you ran `Initialize` from a standalone project, check **Executions → Logs** for the URL of the spreadsheet that was created.
 
 ### Configuration
 
-1. Run the **Initialize** function in setup.gs
+1. Run the **Initialize** function in setup.gs (from the bound sheet’s Apps Script project)
 1. Add Likelihood factors and options. Each option within a factor requires an appropriately formatted row in the **Likelihood** sheet
     1. In the **Likelihood** sheet enter the text of the factor in Column A
     1. Enter the text of the option in Column B
